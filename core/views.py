@@ -39,6 +39,7 @@ def getPlayerData(request):
             response["cost"] = player.cost
             response["pointsHistory"] = player.pointsHistory
             response["photo"] = player.photo
+            response["pointsPerGame"] = player.pointsPerGame
 
         except ObjectDoesNotExist:
             response["error"] = 1

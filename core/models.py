@@ -11,6 +11,7 @@ class Player(models.Model):
     team = models.CharField(max_length=200)
     pointsHistory = models.CommaSeparatedIntegerField(max_length=38)
     photo = models.CharField(max_length=200)
+    pointsPerGame = models.CharField(max_length=200)
 
     def __unicode__(self):
         return self.name

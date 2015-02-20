@@ -1,9 +1,26 @@
+var lineDataset, pieData1, pieData2, colors;
+
 $(document).ready(function () {
+
+    lineDataset = null;
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.animation = true;
+    Chart.defaults.global.tooltipEvents = ["mousemove"];
+    colors = [ 
+                { color : "rgba(180,0,0,0.6)", taken : false }, 
+                { color : "rgba(0,180,0,0.6)", taken : false },
+                { color : "rgba(0,0,180,0.6)", taken : false },
+                { color : "rgba(180,180,0,0.6)", taken : false },
+                { color : "rgba(180,0,180,0.6)", taken : false },
+                { color : "rgba(0,180,180,0.6)", taken : false },
+                { color : "rgba(180,180,180,0.6)", taken : false },
+             ];
 
     $("a.team").click(function () {
         $("#here_table").empty();
         getTeam($(this).html());
     });
+
 });
 
 function getTeam(team) {
@@ -33,12 +50,14 @@ function showTeam(players) {
 
     var tbody = $('<tbody></tbody>');
     for(var i = 0; i < players.length; i++){
-        var row = $('<tr></tr>').addClass("player").attr("id", players[i].id);
-        row.append($('<td></td>').text(players[i].name));
-        row.append($('<td></td>').text(players[i].position));
-        row.append($('<td></td>').text(players[i].totalPoints));
-        row.append($('<td></td>').text(getCost(players[i].cost)));
-        tbody.append(row);
+        if (players[i].totalPoints >= 2) {
+            var row = $('<tr></tr>').addClass("player").attr("id", players[i].id);
+            row.append($('<td></td>').text(players[i].name));
+            row.append($('<td></td>').text(players[i].position));
+            row.append($('<td></td>').text(players[i].totalPoints));
+            row.append($('<td></td>').text(getCost(players[i].cost)));
+            tbody.append(row);
+        }
     }
 
     var table = $('<table id="myTable"></table>').addClass('u-full-width');
@@ -69,7 +88,10 @@ function getPlayer(id) {
             if (data['error'] == 1)
                 toastr.error('Wrong name');
             else {
-                showChart(data);
+                var color = getNextColor();
+                showLineChart(data, color);
+                showPieChart1(data, color);
+                showPieChart2(data, color);
             }
         },
         'error': function() {
@@ -78,37 +100,104 @@ function getPlayer(id) {
     });
 }
 
-function showChart(player) {
+function showPieChart1(player, color) {
+    var ctx = $("#pieChart1").get(0).getContext("2d");
+
+    if (pieData1 == null) {
+        pieData1 = [
+            {
+                value : player["totalPoints"],
+                color : color,
+                hightlight : color,
+                label : player["name"]
+            }
+        ];
+    } else {
+        pieData1.push({
+            value : player["totalPoints"],
+            color : color,
+            hightlight : color,
+            label : player["name"]
+        });
+    }
+
+    var myPieChart = new Chart(ctx).Pie(pieData1);
+    $("#pieTitle1").html("Total Points");
+}
+
+function showPieChart2(player, color) {
+    var ctx = $("#pieChart2").get(0).getContext("2d");
+
+    if (pieData2 == null) {
+        pieData2 = [
+            {
+                value : parseFloat(player["pointsPerGame"]),
+                color : color,
+                hightlight : color,
+                label : player["name"]
+            }
+        ];
+    } else {
+        pieData2.push({
+            value : parseFloat(player["pointsPerGame"]),
+            color : color,
+            hightlight : color,
+            label : player["name"]
+        });
+    }
+
+    var myPieChart = new Chart(ctx).Doughnut(pieData2);
+    $("#pieTitle2").html("Points per Game");
+}
+
+function showLineChart(player, color) {
 
     var pointsString = player["pointsHistory"];
     var points = (pointsString.slice(1, pointsString.length-1)).split(", ");
 
-    var ctx = $("#myChart").get(0).getContext("2d");
+    var ctx = $("#lineChart").get(0).getContext("2d");
 
     var labels = [];
     for (var i = 1; i <= points.length; i++) {
         labels.push("Gameweek " + i);
     }
-    var data = {
-        labels: labels,
-        datasets: [
-        {
-            label: "Player",
-            fillColor: "rgba(220,220,220,0.2)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(220,220,220,1)",
-            data: points
-        }
-        ]
-    };
-    var options = {
-        multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>"
+    
+    if (lineDataset == null) {
+        lineDataset = [
+            {
+                label: player["name"],
+                fillColor: "rgba(0,0,0,0)",
+                strokeColor: color,
+                pointColor: color,
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: color,
+                data: points
+            }
+            ]
+    } else {
+        lineDataset.push(
+            {
+                label: player["name"],
+                fillColor: "rgba(0,0,0,0)",
+                strokeColor: color,
+                pointColor: color,
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: color,
+                data: points
+            }
+            );
     }
-    // This will get the first returned node in the jQuery collection.
-    Chart.defaults.global.responsive = true;
+
+    var data = {
+            labels: labels,
+            datasets: lineDataset
+    };
+
+    var options = {
+        multiTooltipTemplate: "<%= datasetLabel %> - <%= value %> points"
+    }
     var myNewChart = new Chart(ctx).Line(data, options);
     
     $("#title").html(player["name"] + " | " + player["position"] + " | " + player["team"] + " | " + getCost(player["cost"]) + " | " + player["totalPoints"] + " points");
@@ -121,4 +210,17 @@ function getCost(cost) {
         return "£" + (cost/10).toPrecision(3);  
     }
     return "£" + (cost/10).toPrecision(2);
+}
+
+function getNextColor() {
+    for (var i = 0; i < colors.length; i++) {
+        if (colors[i].taken == false) {
+            colors[i].taken = true;
+            return colors[i].color;
+        }
+    }
+    for (var i = 1; i < colors.length; i++) {
+        colors[i].taken = false;
+    }
+    return colors[0].color;
 }
