@@ -2,16 +2,53 @@
 
 {% block body %}
 
-{% include "header.html" %}
-{% load input_type %}
-
 <div class="container">
 
-  <div class="jumbotron text-center">
-    <h1>Welcome!</h1>
-    <p>Your new Django project, {{projectName}}, is ready for development.</p>
-  </div>
-    
+    <div class="row">
+
+        <div class="one column">
+            <ul>
+                <li><a class="team">Arsenal</a></li>
+                <li><a class="team">Aston Villa</a></li>
+                <li><a class="team">Burnley</a></li>
+                <li><a class="team">Chelsea</a></li>
+                <li><a class="team">Crystal Palace</a></li>
+                <li><a class="team">Everton</a></li>
+                <li><a class="team">Hull</a></li>
+                <li><a class="team">Leicester</a></li>
+                <li><a class="team">Liverpool</a></li>
+                <li><a class="team">Man City</a></li>
+                <li><a class="team">Man Utd</a></li>
+                <li><a class="team">Newcastle</a></li>
+                <li><a class="team">QPR</a></li>
+                <li><a class="team">Southampton</a></li>
+                <li><a class="team">Stoke</a></li>
+                <li><a class="team">Sunderland</a></li>
+                <li><a class="team">Swansea</a></li>
+                <li><a class="team">Spurs</a></li>
+                <li><a class="team">West Brom</a></li>
+                <li><a class="team">West Ham</a></li>
+            </ul>
+        </div>
+
+        <div class="eleven columns">
+
+            <div class="three columns">
+                <div class="row" id="here_table"></div>
+            </div>
+
+            <div class="eight columns">
+                <div class="row">
+                    <h5 id="title"> </h5>
+                </div>
+                <div class="row">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 
 </div><!-- /.container -->
 
