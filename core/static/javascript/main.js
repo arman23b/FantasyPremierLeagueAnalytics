@@ -199,10 +199,31 @@ function showLineChart(player, color) {
         multiTooltipTemplate: "<%= datasetLabel %> - <%= value %> points"
     }
     var myNewChart = new Chart(ctx).Line(data, options);
-    
-    $("#title").html(player["name"] + " | " + player["position"] + " | " + player["team"] + " | " + getCost(player["cost"]) + " | " + player["totalPoints"] + " points");
 
-    $("#photo").attr("src", "http://cdn.ismfg.net/static/plfpl/img/shirts/photos/" + player["photo"]);
+    $("#lineTitle").html("Points History");
+
+    var tbody = $("#players_table").find("tbody");
+    var row = tbody.find("#therow");
+    var col = $("<td></td>").append(createPlayerTable(player, color));
+    row.append(col);
+}
+
+function createPlayerTable(player, color) {
+    var table = $("<table></table>");
+    var row = $("<tr></tr>");
+    row.append($("<td rowspan='5'></td>").html("<img src=http://cdn.ismfg.net/static/plfpl/img/shirts/photos/" + 
+                                               player["photo"] + ">"));
+    row.append($("<td></td>").text(player["name"]));
+
+    table.append(row);
+    table.append($("<tr></tr>").append($("<td></td>").text("Team: " + player["team"])));
+    table.append($("<tr></tr>").append($("<td></td>").text("Position: " + player["position"])));
+    table.append($("<tr></tr>").append($("<td></td>").text("Cost: " + getCost(player["cost"]))));
+    table.append($("<tr></tr>").append($("<td></td>").text("Total Points: " + player["totalPoints"])));
+
+    table.attr("style", "border : solid " + color);
+
+    return table;
 }
 
 function getCost(cost) {

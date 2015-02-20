@@ -22,3 +22,8 @@ ul {
     margin-bottom: 0rem;
     list-style: none;
 }
+
+img {
+    width : 75%;
+    height : 75%;
+}
